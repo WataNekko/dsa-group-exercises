@@ -1,3 +1,6 @@
+#ifndef TIMER_CPP
+#define TIMER_CPP
+
 #include "Timer.h"
 
 Timer::Timer() {}
@@ -28,3 +31,5 @@ double Timer::elapsed() {
 
     return static_cast<double> (duration); 
 }
+
+#endif

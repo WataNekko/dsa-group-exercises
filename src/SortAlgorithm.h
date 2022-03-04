@@ -1,5 +1,5 @@
-#ifndef _SORT_ALGORITHM_H
-#define _SORT_ALGORITHM_H
+#ifndef SORT_ALGORITHM_H
+#define SORT_ALGORITHM_H
 
 #include <vector>
 #include <cstddef>

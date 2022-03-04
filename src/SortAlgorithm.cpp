@@ -1,7 +1,9 @@
-#ifndef _SORT_ALGORITHM_CPP
-#define _SORT_ALGORITHM_CPP
+#ifndef SORT_ALGORITHM_CPP
+#define SORT_ALGORITHM_CPP
 #include "SortAlgorithm.h"
 #include <algorithm>
+#include <cstdlib>
+#include <time.h>
 
 using std::swap;
 
@@ -80,19 +82,45 @@ void MergeSort(vector<T>& data) {
     }
 }
 
+template <typename T>
+void InsertionSortForQuick(vector<T>& data, int low, int high) {
+    // Insertion Sort
+    for (size_t i = low + 1; i <= high ; ++i) {
+        auto key = data[i];
+
+        size_t j = i - 1;
+        // Insert data[j] into the sorted sequence data[1..j-1]
+        for (; j >= low && data[j] > key; --j) {
+            data[j + 1] = data[j];
+        }
+        data[j + 1] = key;
+    }
+}
+
+
 template<typename T>
-void QuickSort(vector<T>& data, int low, int high) {
-    if (high - low >= 2) {
+void MedianQuickSort(vector<T>& data, int low, int high) {
+    while (low < high) {
+        if (high - low <= 9) {
+            InsertionSortForQuick(data, low, high);
+            return;
+        }
+
         T p = MedianOfThree(data, low, high);
         auto [left, right] = partition(data, p, low, high);
-        QuickSort(data, low, left - 1);
-        QuickSort(data, right + 1, high);
+        if (left + 1 - low < high - (right - 1)) {
+            MedianQuickSort(data, low, left);
+            low = right;
+        } else {
+            MedianQuickSort(data, right, high);
+            high = left;
+        }
     }   
 }
 
 template<typename T>
 void QuickSort(vector<T>& data) {
-    QuickSort(data, 0, data.size() - 1);
+    MedianQuickSort(data, 0, data.size() - 1);
 }
 
 template<typename T>
@@ -109,7 +137,7 @@ T MedianOfThree(vector<T>& data, int low, int high) {
 
 template<typename T>
 std::pair<int, int> partition(vector<T>& data, T p, int low, int high) {
-    int start = 0, end = high - 1;
+    int start = 0, end = high;
 
     for (int i = 0; i <= end;) {
         if (data[i] < p)

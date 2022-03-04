@@ -1,11 +1,7 @@
 #ifndef SORT_ALGORITHM_CPP
 #define SORT_ALGORITHM_CPP
-#include "SortAlgorithm.h"
-#include <algorithm>
-#include <cstdlib>
-#include <time.h>
 
-using std::swap;
+#include "SortAlgorithm.h"
 
 template<typename T>
 void InsertionSort(vector<T>& data) {
@@ -25,10 +21,6 @@ void InsertionSort(vector<T>& data) {
     }
 } 
 
-/**
- * @brief Return a new vector containing elements from a sub-range of this vector
- * 
- */
 template<typename T>
 vector<T> subList(const vector<T>& data, size_t start, size_t length) {
     size_t end = start + length - 1;
@@ -40,12 +32,6 @@ vector<T> subList(const vector<T>& data, size_t start, size_t length) {
     return result;
 }
 
-/**
- * @brief 
- * 
- * @tparam T 
- * @param data 
- */
 template<typename T>
 vector<T> subList(const vector<T>& data, size_t start) {
     size_t end = data.size() - 1;
@@ -96,7 +82,6 @@ void InsertionSortForQuick(vector<T>& data, int low, int high) {
         data[j + 1] = key;
     }
 }
-
 
 template<typename T>
 void MedianQuickSort(vector<T>& data, int low, int high) {

@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 import argparse
 import csv
 import os
@@ -70,7 +71,7 @@ try:
             xlabel = reader.fieldnames[0]
             for label in data:
                 if label != xlabel:
-                    plt.plot(data[xlabel], data[label], marker="o", label=label)
+                    plt.plot(data[xlabel], data[label], marker="o", alpha=1, linewidth=1.0, linestyle='-.', label=label)
 
             plt.xlabel(xlabel)
             plt.ylabel("Time (ms)")

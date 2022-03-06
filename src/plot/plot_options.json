@@ -1,0 +1,5 @@
+[
+  { "marker": "o", "linewidth": 3 },
+  { "marker": "o", "linewidth": 3, "color": "green" },
+  { "marker": ".", "linewidth": 3, "linestyle": "-.", "color": "#ad1313" }
+]

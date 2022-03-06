@@ -119,7 +119,6 @@ try:
                     plt.plot(
                         data[xlabel],
                         data[label],
-                        marker="o",
                         label=label,
                         **next_options(),
                     )

@@ -16,6 +16,7 @@ public:
     double elapsed();
     template <typename T>
     double SortingTiming(std::function<void(std::vector<T>&)> SortFunc, std::vector<T> collection);
+    double SortingTiming(void (*SortFunc) (int*, int), int arr[], int size);
 private:
     std::chrono::time_point<std::chrono::high_resolution_clock> m_StartTimePoint;
     std::chrono::time_point<std::chrono::high_resolution_clock> m_EndTimePoint;

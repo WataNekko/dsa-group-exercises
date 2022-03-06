@@ -32,4 +32,11 @@ double Timer::elapsed() {
     return static_cast<double> (duration); 
 }
 
+double Timer::SortingTiming(void (*SortFunc) (int*, int), int arr[], int size) {
+    start();
+    SortFunc(arr, size);
+    stop();
+    return elapsed();
+}
+
 #endif

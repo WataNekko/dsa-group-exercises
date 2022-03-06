@@ -3,138 +3,87 @@
 
 #include "SortAlgorithm.h"
 
-template<typename T>
-void InsertionSort(vector<T>& data) {
-    // The length of the vector
-    size_t length = data.size();
+void InsertionSort(int arr[], int size) {
+    for (int i = 1; i < size; ++i) {
+        int key = arr[i];
 
-    // Insertion Sort
-    for (size_t i = 1; i < length; ++i) {
-        auto key = data[i];
-
-        size_t j = i - 1;
+        int j = i - 1;
         // Insert data[j] into the sorted sequence data[1..j-1]
-        for (; j >= 0 && data[j] > key; --j) {
-            data[j + 1] = data[j];
+        for (; j >= 0 && arr[j] > key; --j) {
+            arr[j + 1] = arr[j];
         }
-        data[j + 1] = key;
+        arr[j + 1] = key;
     }
-} 
-
-template<typename T>
-vector<T> subList(const vector<T>& data, size_t start, size_t length) {
-    size_t end = start + length - 1;
-    vector<T> result;
-    for (size_t i = start; i <= end; ++i) {
-        result.push_back(data[i]);
-    }
-
-    return result;
 }
 
-template<typename T>
-vector<T> subList(const vector<T>& data, size_t start) {
-    size_t end = data.size() - 1;
-    vector<T> result;
-    for (size_t i = start; i <= end; ++i) {
-        result.push_back(data[i]);
-    }
-    return result;
-}
-
-template<typename T>
-void MergeSort(vector<T>& data) {
-    if (data.size() <= 1) return;
-
-    auto left = subList(data, 0, data.size() / 2);
-    auto right = subList(data, data.size() / 2);
-
-    MergeSort(left);
-    MergeSort(right);
-
-    size_t i1 = 0;
-    size_t i2 = 0;
-
-    for (size_t i = 0; i < data.size(); ++i) {
-        if (i2 >= right.size() ||
-            (i1 < left.size() && left[i1] < right[i2])) {
-                data[i] = left[i1];
-                ++i1;
-            }
+void merge(int arr[], int l, int m, int r)
+{
+    int i, j, k;
+    int a1 = m - l + 1;
+    int a2 = r - m;
+  
+    int L[a1], R[a2];
+    
+    for (i = 0; i < a1; i++)
+        L[i] = arr[l + i];
+    for (j = 0; j < a2; j++)
+        R[j] = arr[m + 1 + j];
+  
+    i = 0; 
+    j = 0; 
+    k = l; 
+    while (i < a1 && j < a2) {
+        if (L[i] <= R[j]) {
+            arr[k] = L[i];
+            i++;
+        }
         else {
-            data[i] = right[i2];
-            ++i2;
+            arr[k] = R[j];
+            j++;
         }
+        k++;
+    }
+  
+
+    while (i < a1) {
+        arr[k] = L[i];
+        i++;
+        k++;
+    }
+  
+    while (j < a2) {
+        arr[k] = R[j];
+        j++;
+        k++;
+    }
+}
+  
+void MergeSort(int arr[], int l, int r)
+{
+    if (l < r) {
+        
+        int m = l + (r - l) / 2;
+  
+        MergeSort(arr, l, m);
+        MergeSort(arr, m + 1, r);
+  
+        merge(arr, l, m, r);
     }
 }
 
-template <typename T>
-void InsertionSortForQuick(vector<T>& data, int low, int high) {
-    // Insertion Sort
-    for (size_t i = low + 1; i <= high ; ++i) {
-        auto key = data[i];
-
-        size_t j = i - 1;
-        // Insert data[j] into the sorted sequence data[1..j-1]
-        for (; j >= low && data[j] > key; --j) {
-            data[j + 1] = data[j];
-        }
-        data[j + 1] = key;
-    }
+void MergeSort(int arr[], int size) {
+    MergeSort(arr, 0, size - 1);
 }
 
-template<typename T>
-void MedianQuickSort(vector<T>& data, int low, int high) {
-    while (low < high) {
-        if (high - low <= 9) {
-            InsertionSortForQuick(data, low, high);
-            return;
-        }
-
-        T p = MedianOfThree(data, low, high);
-        auto [left, right] = partition(data, p, low, high);
-        if (left + 1 - low < high - (right - 1)) {
-            MedianQuickSort(data, low, left);
-            low = right;
-        } else {
-            MedianQuickSort(data, right, high);
-            high = left;
-        }
-    }   
+int compareMyType (const void * a, const void * b)
+{
+  if ( *(int*)a <  *(int*)b ) return -1;
+  if ( *(int*)a == *(int*)b ) return 0;
+    return 1;
 }
 
-template<typename T>
-void QuickSort(vector<T>& data) {
-    MedianQuickSort(data, 0, data.size() - 1);
+void QuickSort(int arr[], int size) {
+    qsort(arr, size, sizeof(int), compareMyType);
 }
-
-template<typename T>
-T MedianOfThree(vector<T>& data, int low, int high) {
-    int mid = (low + high) / 2;
-    if (data[mid] < data[low])
-        swap(data[mid], data[low]);
-    if (data[high] < data[low])
-        swap(data[high], data[low]);
-    if (data[mid] < data[high])
-        swap(data[mid], data[high]);
-    return data[high];
-}
-
-template<typename T>
-std::pair<int, int> partition(vector<T>& data, T p, int low, int high) {
-    int start = 0, end = high;
-
-    for (int i = 0; i <= end;) {
-        if (data[i] < p)
-            swap(data[i++], data[start++]);
-        else if (data[i] > p)
-            swap(data[i], data[end--]);
-        else 
-            ++i;
-    }
-
-    return {start, end};
-}
-
 
 #endif

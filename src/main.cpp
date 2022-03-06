@@ -6,6 +6,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <thread>
 
 using std::vector;
 using std::endl;
@@ -40,17 +41,24 @@ int main(int argc, char* argv[]) {
 
         GenerateRandomArray(TestArray, size);
         auto InsertionTime = timer.SortingTiming(InsertionSort, TestArray, size);
+        stream << size << ',' << InsertionTime << std::flush;
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+
 
         GenerateRandomArray(TestArray, size);
         auto MergeTime = timer.SortingTiming(MergeSort, TestArray, size);
+        stream << ',' << MergeTime << std::flush;
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
         GenerateRandomArray(TestArray, size);
         auto QuickTime = timer.SortingTiming(QuickSort, TestArray, size);
-
-        stream << size << "," << InsertionTime << "," << MergeTime << "," << QuickTime << endl;
+        stream << ',' << QuickTime << endl;
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
         delete TestArray;
     }
+
+    //std::cout << "Done!" << endl;
 
     return 0;
 }

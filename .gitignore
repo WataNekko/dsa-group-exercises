@@ -2,3 +2,4 @@
 oldCPP
 .vscode
 src/*.txt
+*.exe

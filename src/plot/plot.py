@@ -26,6 +26,13 @@ group.add_argument(
     help="output the plot to FILE instead of showing in a window",
 )
 parser.add_argument("-s", "--style", help="set the style of the figure")
+parser.add_argument(
+    "-O",
+    "--plot-options",
+    metavar="JSON",
+    help="set the plotting options with an array of options in json format "
+    "(JSON can be a json string or a json file name)",
+)
 
 args = parser.parse_args()
 
@@ -50,6 +57,30 @@ try:
                     f"Error: {ex}\n\nstyle.available=\n\t{plt.style.available}"
                 )
 
+        # parse plotting options
+        if args.plot_options:
+            import json
+            from json.decoder import JSONDecodeError
+
+            plot_options: list[dict]
+            try:
+                plot_options = json.loads(args.plot_options)
+            except JSONDecodeError:
+                try:
+                    with open(args.plot_options) as f:
+                        plot_options = json.load(f)
+                except (FileNotFoundError, OSError, JSONDecodeError):
+                    parser.error(
+                        "argument -O/--plot-options: invalid JSON or file name"
+                    )
+
+            if (
+                not isinstance(plot_options, list)
+                or not plot_options
+                or not all(isinstance(option, dict) for option in plot_options)
+            ):
+                parser.error("argument -O/--plot-options: invalid options array")
+
         def update_plot():
             """Main function to draw the plot"""
             file.seek(0)  # re-read the file from the start
@@ -65,12 +96,32 @@ try:
             data = {key: tuple(row[key] for row in rows) for key in reader.fieldnames}
 
             # update the plot with new data
+            if args.plot_options:
+
+                def next_options():
+                    try:
+                        return next(next_options.iter)
+                    except StopIteration:
+                        next_options.iter = iter(plot_options)  # roll over
+                        return next(next_options.iter)
+
+                next_options.iter = iter(plot_options)
+            else:
+                no_opt = {}
+                next_options = lambda: no_opt
+
             plt.cla()
 
             xlabel = reader.fieldnames[0]
             for label in data:
                 if label != xlabel:
-                    plt.plot(data[xlabel], data[label], marker="o", label=label)
+                    plt.plot(
+                        data[xlabel],
+                        data[label],
+                        marker="o",
+                        label=label,
+                        **next_options(),
+                    )
 
             plt.xlabel(xlabel)
             plt.ylabel("Time (ms)")

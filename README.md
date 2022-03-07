@@ -18,7 +18,7 @@ The benchmarking program can be built with:
 
 ```sh
 cd src/
-g++ \*.cpp -o benchmark -Wall
+g++ *.cpp -o benchmark -Wall
 ```
 
 Then the following command can be used to run and _then_ plot it

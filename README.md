@@ -34,3 +34,5 @@ python ./plot/plot.py --watch ../benchmark_result.csv -O ./plot/plot_options.jso
 ```
 
 **_Our generated result can be viewed at [benchmark_result.csv](benchmark_result.csv) and [benchmark_result.png](benchmark_result.png)_**
+
+![benchmark result](benchmark_result.png)

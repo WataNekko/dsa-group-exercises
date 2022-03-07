@@ -21,7 +21,7 @@ cd src/
 g++ \*.cpp -o benchmark -Wall
 ```
 
-Then the following command can be used to run and then plot it
+Then the following command can be used to run and _then_ plot it
 
 ```sh
 ./benchmark ../benchmark_result.csv && python ./plot/plot.py ../benchmark_result.csv -O ./plot/plot_options.json
@@ -33,4 +33,4 @@ or use the following to run and plot the result simultaneously with the -w/--wat
 ./benchmark ../benchmark_result.csv & python ./plot/plot.py ../benchmark_result.csv -O ./plot/plot_options.json --watch && fg
 ```
 
-_Our generated result can be viewed at [benchmark_result.csv](benchmark_result.csv) and [benchmark_result.png](benchmark_result.png)_
+**_Our generated result can be viewed at [benchmark_result.csv](benchmark_result.csv) and [benchmark_result.png](benchmark_result.png)_**

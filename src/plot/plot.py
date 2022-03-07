@@ -116,12 +116,7 @@ try:
             xlabel = reader.fieldnames[0]
             for label in data:
                 if label != xlabel:
-                    plt.plot(
-                        data[xlabel],
-                        data[label],
-                        label=label,
-                        **next_options(),
-                    )
+                    plt.plot(data[xlabel], data[label], label=label, **next_options())
 
             plt.xlabel(xlabel)
             plt.ylabel("Time (ms)")

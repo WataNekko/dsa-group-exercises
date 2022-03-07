@@ -35,7 +35,8 @@ int main(int argc, char *argv[])
     }
 
     // Start benchmark
-    std::cout << "Running benchmark..." << endl;
+    std::cout << "[Running benchmark...]\n"
+              << endl;
 
     stream << "\"Size of input\",\"Insertion Sort\",\"Merge Sort\",\"Quicksort\"" << endl;
 
@@ -61,7 +62,7 @@ int main(int argc, char *argv[])
         delete TestArray;
     }
 
-    std::cout << "Done benchmark" << endl;
+    std::cout << "\n[Done benchmark]" << endl;
 
     return 0;
 }

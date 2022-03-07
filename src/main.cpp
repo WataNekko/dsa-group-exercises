@@ -1,15 +1,14 @@
-#include <iostream>
-#include "Timer.h"
-#include "SortAlgorithm.h"
 #include "Random.h"
+#include "SortAlgorithm.h"
+#include "Timer.h"
 #include <fstream>
 #include <iostream>
 #include <string>
-#include <vector>
 #include <thread>
+#include <vector>
 
-using std::vector;
 using std::endl;
+using std::vector;
 
 static const vector<int> TEST_SIZES{10, 50, 100, 200, 500, 1000, 2000, 5000, 7000, 10000,
                                     20000, 30000, 40000, 50000, 60000, 70000, 80000, 90000, 100000};
@@ -33,6 +32,10 @@ int main(int argc, char* argv[]) {
         std::cout << "Error with stream! Can not run the program" << endl;
         return -1;
     }
+
+    // Start benchmark
+    std::cout << "Running benchmark..." << endl;
+
     stream << "\"Size of input\",\"Insertion Sort\",\"Merge Sort\",\"Quicksort\"" << endl;
 
     for (auto size: TEST_SIZES) {
@@ -58,7 +61,7 @@ int main(int argc, char* argv[]) {
         delete TestArray;
     }
 
-    //std::cout << "Done!" << endl;
+    std::cout << "Done benchmark." << endl;
 
     return 0;
 }

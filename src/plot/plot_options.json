@@ -1,5 +1,5 @@
 [
-  { "marker": "o", "linewidth": 3 },
-  { "marker": "o", "linewidth": 3, "color": "green" },
-  { "marker": ".", "linewidth": 3, "linestyle": "-.", "color": "#ad1313" }
+  { "marker": "o", "linewidth": 3, "color": "tab:blue" },
+  { "marker": "o", "linewidth": 3, "color": "tab:green" },
+  { "marker": ".", "linewidth": 3, "color": "tab:red", "linestyle": "-." }
 ]

@@ -43,7 +43,7 @@ double Timer::SortingTiming(void (*SortFunc)(int *, int), int arr[], int size)
     return elapsed();
 }
 
-double Timer::AverageSortingTiming(void (*SortFunc)(int *, int), int arr[], int size, int iterations = 10)
+double Timer::AverageSortingTiming(void (*SortFunc)(int *, int), int arr[], int size, int iterations)
 {
     double sum = 0.0;
     for (int i = 0; i < iterations; ++i) {

@@ -30,7 +30,7 @@ Then the following command can be used to run and _then_ plot it
 or use the following to run and plot the result simultaneously with the -w/--watch flag (to have sort of an animation (-ish) for the plot. See [plot.py](./src/plot/plot.py)'s usage with `python plot.py -h` for help.)
 
 ```sh
-./benchmark ../benchmark_result.csv & python ./plot/plot.py ../benchmark_result.csv -O ./plot/plot_options.json --watch && fg
+python ./plot/plot.py --watch ../benchmark_result.csv -O ./plot/plot_options.json & ./benchmark ../benchmark_result.csv
 ```
 
 **_Our generated result can be viewed at [benchmark_result.csv](benchmark_result.csv) and [benchmark_result.png](benchmark_result.png)_**

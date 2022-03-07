@@ -1,6 +1,4 @@
-# sorting-algo-benchmark
-
-Benchmark and compare Insertion sort, Merge sort and Quicksort
+# Benchmark and compare Insertion sort, Merge sort and Quicksort
 
 ### Benchmarking
 

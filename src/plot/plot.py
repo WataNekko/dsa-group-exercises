@@ -82,6 +82,12 @@ try:
             ):
                 parser.error("argument -O/--plot-options: invalid options array")
 
+        def on_close(_):
+            raise SystemExit
+
+        # raise SystemExit on close to prevent python hanging bug that sometimes occurs
+        plt.gcf().canvas.mpl_connect("close_event", on_close)
+
         def update_plot():
             """Main function to draw the plot"""
             file.seek(0)  # re-read the file from the start

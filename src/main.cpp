@@ -3,6 +3,7 @@
 #include <fstream>
 #include <iostream>
 #include <string>
+#include <thread>
 #include <vector>
 
 using std::endl;
@@ -43,9 +44,11 @@ int main(int argc, char *argv[])
 
         double InsertionTime = timer.AverageSortingTiming(InsertionSort, array, size);
         stream << size << ',' << InsertionTime << std::flush;
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
         double MergeTime = timer.AverageSortingTiming(MergeSort, array, size);
         stream << ',' << MergeTime << std::flush;
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
         double QuickTime = timer.AverageSortingTiming(QuickSort, array, size);
         stream << ',' << QuickTime << endl;

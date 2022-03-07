@@ -1,10 +1,8 @@
-#include "Random.h"
 #include "SortAlgorithm.h"
 #include "Timer.h"
 #include <fstream>
 #include <iostream>
 #include <string>
-#include <thread>
 #include <vector>
 
 using std::endl;
@@ -35,31 +33,24 @@ int main(int argc, char *argv[])
     }
 
     // Start benchmark
-    std::cout << "[Running benchmark...]\n"
-              << endl;
+    std::cout << "[Running benchmark...]" << endl;
 
     stream << "\"Size of input\",\"Insertion Sort\",\"Merge Sort\",\"Quicksort\"" << endl;
 
     for (auto size : TEST_SIZES) {
-        int *TestArray = new int[size];
+        int *array = new int[size];
         Timer timer;
 
-        GenerateRandomArray(TestArray, size);
-        auto InsertionTime = timer.SortingTiming(InsertionSort, TestArray, size);
+        double InsertionTime = timer.AverageSortingTiming(InsertionSort, array, size);
         stream << size << ',' << InsertionTime << std::flush;
-        std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
-        GenerateRandomArray(TestArray, size);
-        auto MergeTime = timer.SortingTiming(MergeSort, TestArray, size);
+        double MergeTime = timer.AverageSortingTiming(MergeSort, array, size);
         stream << ',' << MergeTime << std::flush;
-        std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
-        GenerateRandomArray(TestArray, size);
-        auto QuickTime = timer.SortingTiming(QuickSort, TestArray, size);
+        double QuickTime = timer.AverageSortingTiming(QuickSort, array, size);
         stream << ',' << QuickTime << endl;
-        std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
-        delete TestArray;
+        delete[] array;
     }
 
     std::cout << "\n[Done benchmark]" << endl;

@@ -1,4 +1,5 @@
 #include "Timer.h"
+#include "Random.h"
 
 Timer::Timer() {}
 
@@ -40,4 +41,14 @@ double Timer::SortingTiming(void (*SortFunc)(int *, int), int arr[], int size)
     SortFunc(arr, size);
     stop();
     return elapsed();
+}
+
+double Timer::AverageSortingTiming(void (*SortFunc)(int *, int), int arr[], int size, int iterations = 10)
+{
+    double sum = 0.0;
+    for (int i = 0; i < iterations; ++i) {
+        GenerateRandomArray(arr, size);
+        sum += SortingTiming(SortFunc, arr, size);
+    }
+    return sum / iterations;
 }

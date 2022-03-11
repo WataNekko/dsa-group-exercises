@@ -1,5 +1,7 @@
 # vscode folder
 .vscode/
 
-# built executables
+# compiled files
 *.exe
+*.o
+*.gch

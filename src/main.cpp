@@ -1,6 +1,4 @@
-#include <array>
 #include <iostream>
-#include <vector>
 
 #include "dsa/binary_search_tree.hpp"
 
@@ -13,42 +11,26 @@ std::ostream &operator<<(std::ostream &stream, const dsa::BinarySearchTree<T> &b
 
 int main()
 {
-    // create tree
-    {
-        dsa::BinarySearchTree<int> tree;
-    }
-    {
-        dsa::BinarySearchTree<int> tree{4, 1, 2};
-    }
-    {
-        std::vector<int> v = {6, 1, 3};
-        dsa::BinarySearchTree<int> tree = v;
-        dsa::BinarySearchTree<int> tree1(v);
-    }
-    {
-        std::array<int, 4> arr = {7, 2, 3, 7};
-        dsa::BinarySearchTree<int> tree = arr;
-        dsa::BinarySearchTree<int> tree1(arr);
-    }
-    {
-        int arr[] = {7, 2, 3, 7};
-        dsa::BinarySearchTree<int> tree = {arr, sizeof(arr) / sizeof(int)}; //
-        dsa::BinarySearchTree<int> tree1(arr, sizeof(arr) / sizeof(int));
-    }
-
-    // tree operations
     dsa::BinarySearchTree<int> tree = {13, 6, 15, 17, 20, 9, 4, 3, 7, 2, 18};
-    tree.search(15);
-    tree.insert(19);
+    std::cout << tree << "(binary search tree)\n"
+              << std::endl;
+
+    tree.insert(18);
+    std::cout << tree << "(inserted 18)" << std::endl;
+    tree.insert(11);
+    std::cout << tree << "(inserted 11)" << std::endl;
+    tree.insert(25);
+    std::cout << tree << "(inserted 25)\n"
+              << std::endl;
+
+    tree.remove(6);
+    std::cout << tree << "(removed 6)" << std::endl;
+    tree.remove(13);
+    std::cout << tree << "(removed 13)" << std::endl;
     tree.remove(18);
+    std::cout << tree << "(removed 18)\n"
+              << std::endl;
 
-    // traverse tree
-    dsa::BinarySearchTree<int> tree;
-    auto print = [](const int val) { std::cout << val << ' '; };
-    tree.inorder(print);
-    tree.preorder(print);
-    tree.postorder(print);
-
-    // printing tree
-    std::cout << tree << std::endl;
+    std::cout << (tree.search(7) ? "Found " : "Cannot find ") << 7 << std::endl;
+    std::cout << (tree.search(19) ? "Found " : "Cannot find ") << 19 << std::endl;
 }

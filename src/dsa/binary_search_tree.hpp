@@ -14,16 +14,44 @@ namespace dsa {
             T key;
             std::shared_ptr<Node> left, right;
             std::weak_ptr<Node> parent;
+
+            Node(const T &key, const std::shared_ptr<Node> &parent)
+                : key(key), parent(parent) {}
+
+            Node(const std::shared_ptr<Node> &other)
+                : key(other->key),
+                  left(clone(other->left)),
+                  right(clone(other->right)) {}
+
+            static std::shared_ptr<Node> clone(const std::shared_ptr<Node> &src)
+            {
+                if (!src) {
+                    return nullptr;
+                }
+
+                auto node = std::make_shared<Node>(src);
+                if (node) {
+                    if (node->left) {
+                        node->left->parent = node;
+                    }
+                    if (node->right) {
+                        node->right->parent = node;
+                    }
+                }
+
+                return node;
+            }
         };
 
         using NodePtr = std::shared_ptr<Node>;
         using TraversalCallback = std::function<void(const T &)>;
 
     private:
-        NodePtr root;
+        NodePtr root_;
 
     public:
         // constructors
+
         BinarySearchTree() = default;
 
         BinarySearchTree(const T *array, size_t size)
@@ -48,7 +76,19 @@ namespace dsa {
             }
         }
 
+        BinarySearchTree(const BinarySearchTree &other)
+            : root_(Node::clone(other.root_)) {}
+
+        BinarySearchTree &operator=(const BinarySearchTree &other)
+        {
+            if (this != &other) {
+                root_ = Node::clone(other.root_);
+            }
+            return *this;
+        }
+
         // tree traversal
+
         static void inorder(const NodePtr &node, const TraversalCallback &callback)
         {
             if (node) {
@@ -60,7 +100,7 @@ namespace dsa {
 
         void inorder(const TraversalCallback &callback) const
         {
-            inorder(root, callback);
+            inorder(root_, callback);
         }
 
         static void preorder(const NodePtr &node, const TraversalCallback &callback)
@@ -74,7 +114,7 @@ namespace dsa {
 
         void preorder(const TraversalCallback &callback) const
         {
-            preorder(root, callback);
+            preorder(root_, callback);
         }
 
         static void postorder(const NodePtr &node, const TraversalCallback &callback)
@@ -88,65 +128,180 @@ namespace dsa {
 
         void postorder(const TraversalCallback &callback) const
         {
-            postorder(root, callback);
+            postorder(root_, callback);
         }
 
         // tree search
-        static NodePtr search(const NodePtr &node, const T &key)
+    private:
+        static NodePtr &search_(const NodePtr &node, const T &key)
         {
             const NodePtr *nodePP = &node;
-            while (*nodePP != nullptr && key != (**nodePP).key) {
-                if (key < (**nodePP).key) {
-                    nodePP = &(**nodePP).left;
+            while (*nodePP != nullptr && key != (*nodePP)->key) {
+                if (key < (*nodePP)->key) {
+                    nodePP = &(*nodePP)->left;
                 }
                 else {
-                    nodePP = &(**nodePP).right;
+                    nodePP = &(*nodePP)->right;
                 }
             }
-            return *nodePP;
+            return const_cast<NodePtr &>(*nodePP);
+        }
+
+        NodePtr &search_(const T &key) const
+        {
+            return search_(root_, key);
+        }
+
+    public:
+        static NodePtr search(const NodePtr &node, const T &key)
+        {
+            return search_(node, key);
         }
 
         NodePtr search(const T &key) const
         {
-            return search(root, key);
+            return search_(root_, key);
         }
 
         // min max
-        static NodePtr minimum(const NodePtr &node)
+    private:
+        static NodePtr &minimum_(const NodePtr &node)
         {
             const NodePtr *nodePP = &node;
-            while ((**nodePP).left != nullptr) {
-                nodePP = &(**nodePP).left;
+            while ((*nodePP)->left != nullptr) {
+                nodePP = &(*nodePP)->left;
             }
-            return *nodePP;
+            return const_cast<NodePtr &>(*nodePP);
         }
 
-        NodePtr minimum()
+    public:
+        static NodePtr minimum(const NodePtr &node)
         {
-            return minimum(root);
+            return minimum_(node);
+        }
+
+        NodePtr minimum() const
+        {
+            return minimum_(root_);
         }
 
         static NodePtr maximum(const NodePtr &node)
         {
             const NodePtr *nodePP = &node;
-            while ((**nodePP).right != nullptr) {
-                nodePP = &(**nodePP).right;
+            while ((*nodePP)->right != nullptr) {
+                nodePP = &(*nodePP)->right;
             }
             return *nodePP;
         }
 
-        NodePtr maximum()
+        NodePtr maximum() const
         {
-            return maximum(root);
+            return maximum(root_);
         }
 
         // successor
-        static NodePtr successor(const NodePtr &node);
+
+        static NodePtr successor(const NodePtr &node)
+        {
+            if (node->right) {
+                return minimum(node->right);
+            }
+
+            NodePtr child = node;
+            NodePtr parent = child->parent.lock();
+            while (parent != nullptr && child == parent->right) {
+                child = parent;
+                parent = parent->parent.lock();
+            }
+            return parent;
+        }
 
         // insert remove
-        void insert(const T &key);
-        void transplant(const NodePtr &a, const NodePtr &b);
-        NodePtr remove(const T &key);
-    };
 
-}
+        void insert(const T &key)
+        {
+            NodePtr *child = &root_;
+            const NodePtr *parent = child;
+
+            while (*child != nullptr) {
+                parent = child;
+
+                if (key < (*child)->key) {
+                    child = &(*child)->left;
+                }
+                else {
+                    child = &(*child)->right;
+                }
+            }
+
+            *child = std::make_shared<Node>(key, *parent);
+        }
+
+    private:
+        static void transplant(NodePtr &dest, const NodePtr &src)
+        {
+            if (src != nullptr) {
+                // setting src's parent
+                if (dest != nullptr) {
+                    src->parent = dest->parent;
+                }
+                else {
+                    src->parent.reset();
+                }
+            }
+            if (dest != nullptr) {
+                // resetting parent at old dest object
+                dest->parent.reset();
+            }
+
+            dest = src;
+        }
+
+    public:
+        /**
+         * Remove the element from the tree. Return false if the element is not found, otherwise true.
+         */
+        bool remove(const T &key)
+        {
+            NodePtr &nodeRef = search_(key);
+
+            if (!nodeRef) {
+                // not found
+                return false;
+            }
+
+            if (!nodeRef->left) {
+                NodePtr removed = nodeRef;
+                transplant(nodeRef, nodeRef->right);
+                removed->right.reset();
+            }
+            else if (!nodeRef->right) {
+                NodePtr removed = nodeRef;
+                transplant(nodeRef, nodeRef->left);
+                removed->left.reset();
+            }
+            else {
+                NodePtr &successorRef = minimum_(nodeRef->right);
+                NodePtr successor = successorRef;
+
+                if (successorRef->parent.lock() != nodeRef) {
+                    transplant(successorRef, successorRef->right);
+                    successor->right = nodeRef->right;
+                    successor->right->parent = successor;
+                }
+
+                NodePtr removed = nodeRef;
+                transplant(nodeRef, successor);
+                successor->left = removed->left;
+                successor->left->parent = successor;
+
+                removed->left.reset();
+                removed->right.reset();
+            }
+
+            return true;
+        }
+
+    }; // class BinarySearchTree
+
+} // namespace dsa

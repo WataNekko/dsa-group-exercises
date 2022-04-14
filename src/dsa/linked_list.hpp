@@ -1,73 +1,163 @@
 #pragma once
 
-#include <initializer_list>
 #include <memory>
 #include <ostream>
 
 namespace dsa {
 
+    template <class List>
+    struct LinkedListNode {
+        using value_type = typename List::value_type;
+        using NodeUniquePtr = typename List::NodeUniquePtr;
+        using NodePtr = typename List::NodePtr;
+
+        value_type key;
+        NodeUniquePtr next;
+        NodePtr prev;
+
+        template <typename T>
+        LinkedListNode(T &&key, NodeUniquePtr &&next, NodePtr prev)
+            : key{std::forward<T>(key)}, next(std::move(next)), prev(prev) {}
+
+    }; // struct LinkedListNode
+
+    template <class List>
+    class LinkedListConstIterator {
+        friend List;
+
+    public:
+        using iterator_category = std::forward_iterator_tag;
+        using difference_type = std::ptrdiff_t;
+        using value_type = typename List::value_type;
+        using pointer = const value_type *;
+        using reference = const value_type &;
+
+        using NodeUniquePtr = typename List::NodeUniquePtr;
+
+    protected:
+        const NodeUniquePtr *curr_;
+
+    public:
+        LinkedListConstIterator(const NodeUniquePtr &node) : curr_(&node) {}
+
+        reference operator*() const { return (*curr_)->key; }
+        pointer operator->() const { return &*(*this); }
+
+        LinkedListConstIterator &operator++()
+        {
+            curr_ = &(*curr_)->next;
+            return *this;
+        }
+
+        LinkedListConstIterator operator++(int)
+        {
+            LinkedListConstIterator tmp = *this;
+            ++(*this);
+            return tmp;
+        }
+
+        bool operator==(const LinkedListConstIterator &other) const { return curr_ == other.curr_; }
+        bool operator!=(const LinkedListConstIterator &other) const { return !(*this == other); }
+
+    }; // class LinkedListConstIterator
+
+    template <class List>
+    class LinkedListIterator : public LinkedListConstIterator<List> {
+    public:
+        using value_type = typename List::value_type;
+        using pointer = value_type *;
+        using reference = value_type &;
+
+        reference operator*() const { return (*this->curr_)->key; }
+        pointer operator->() const { return &*(*this); }
+
+        LinkedListIterator &operator++()
+        {
+            this->curr_ = &(*this->curr_)->next;
+            return *this;
+        }
+
+        LinkedListIterator operator++(int)
+        {
+            LinkedListIterator tmp = *this;
+            ++(*this);
+            return tmp;
+        }
+
+    }; // class LinkedListIterator
+
     template <typename T>
     class LinkedList {
     public:
-        struct Node {
-            T key;
-            std::shared_ptr<Node> next;
-            std::weak_ptr<Node> prev;
+        using value_type = T;
 
-            Node(const T &key, std::shared_ptr<Node> next)
-                : key(key), next(std::move(next)), prev{} {}
-        };
+        using Node = LinkedListNode<LinkedList>;
+        using NodeUniquePtr = std::unique_ptr<Node>;
+        using NodePtr = Node *;
 
-        LinkedList(std::initializer_list<T> list)
+        using const_iterator = LinkedListConstIterator<LinkedList>;
+        using iterator = LinkedListIterator<LinkedList>;
+
+    private:
+        NodeUniquePtr head_;
+        NodePtr tail_;
+
+    public:
+        // constructor
+
+        template <typename... Args>
+        LinkedList(Args &&...args) : head_{}, tail_{}
         {
-            for (auto it = std::rbegin(list),
-                      end = std::rend(list);
-                 it != end;
-                 ++it) {
-                insert(*it);
-            }
+            (insert(std::forward<Args>(args)), ...);
         }
 
-        void insert(const T &key)
+        // iterator
+
+        const_iterator begin() const { return {head_}; }
+        const_iterator end() const { return {tail_ ? tail_->next : head_}; }
+
+        iterator begin() { return {head_}; }
+        iterator end() { return {tail_ ? tail_->next : head_}; }
+
+        // linked list operations
+
+        template <typename K>
+        void insert(K &&key)
         {
-            head_ = std::make_shared<Node>(key, std::move(head_));
-            if (head_->next) {
-                head_->next->prev = head_;
-            }
+            NodeUniquePtr &next = tail_ ? tail_->next : head_;
+
+            next = std::make_unique<Node>(std::forward<K>(key), nullptr, tail_);
+            tail_ = next.get();
         }
 
-        std::shared_ptr<Node> remove(const T &key)
+        bool remove(const T &key)
         {
-            auto node = search(key);
-            if (node) {
-                node->next->prev = node->prev;
-                node->prev.lock()->next = std::move(node->next);
-                node->prev.reset();
+            for (auto it = begin(), end_ = end(); it != end_; ++it) {
+                if (*it == key) {
+                    auto &curr = *const_cast<NodeUniquePtr *>(it.curr_);
+
+                    (curr->next
+                         ? curr->next->prev // not tail
+                         : tail_            // tail
+                     ) = curr->prev;
+
+                    curr = std::move(curr->next);
+                    return true;
+                }
             }
-            return node;
+            return false;
         }
 
-        std::shared_ptr<Node> search(const T &key) const
-        {
-            const std::shared_ptr<Node> *curr = &head_;
-            while (*curr != nullptr && (*curr)->key != key) {
-                curr = &(*curr)->next;
-            }
-            return *curr;
-        }
+        // printing
 
         friend std::ostream &operator<<(std::ostream &os, const LinkedList &list)
         {
-            const std::shared_ptr<Node> *curr = &list.head_;
-            while (*curr != nullptr) {
-                os << (*curr)->key << ' ';
-                curr = &(*curr)->next;
+            for (const auto &el : list) {
+                os << el << ' ';
             }
             return os;
         }
 
-    private:
-        std::shared_ptr<Node> head_;
-    };
+    }; // class LinkedList
 
 } // namespace dsa

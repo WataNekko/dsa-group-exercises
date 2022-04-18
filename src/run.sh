@@ -2,4 +2,4 @@
 
 cd $(dirname $(realpath $0))
 
-g++ -std=c++17 -Wall -o main main.cpp && ./main
+g++ -std=c++17 -Wall -o main main.cpp dsa/*.cpp && ./main

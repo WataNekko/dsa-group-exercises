@@ -2,22 +2,23 @@
 
 #include <memory>
 #include <ostream>
+#include <type_traits>
 
 namespace dsa {
 
-    template <class List>
+    template <typename T>
     struct LinkedListNode {
-        using value_type = typename List::value_type;
-        using NodeUniquePtr = typename List::NodeUniquePtr;
-        using NodePtr = typename List::NodePtr;
+    public:
+        using NodeUniquePtr = std::unique_ptr<LinkedListNode>;
+        using NodePtr = LinkedListNode *;
 
-        value_type key;
+        T key;
         NodeUniquePtr next;
         NodePtr prev;
 
-        template <typename T>
-        LinkedListNode(T &&key, NodeUniquePtr &&next, NodePtr prev)
-            : key{std::forward<T>(key)}, next(std::move(next)), prev(prev) {}
+        template <typename Ref>
+        LinkedListNode(Ref &&key, const NodePtr prev)
+            : key{std::forward<Ref>(key)}, next{}, prev(prev) {}
 
     }; // struct LinkedListNode
 
@@ -91,9 +92,9 @@ namespace dsa {
     public:
         using value_type = T;
 
-        using Node = LinkedListNode<LinkedList>;
-        using NodeUniquePtr = std::unique_ptr<Node>;
-        using NodePtr = Node *;
+        using Node = LinkedListNode<value_type>;
+        using NodeUniquePtr = typename Node::NodeUniquePtr;
+        using NodePtr = typename Node::NodePtr;
 
         using const_iterator = LinkedListConstIterator<LinkedList>;
         using iterator = LinkedListIterator<LinkedList>;
@@ -103,15 +104,54 @@ namespace dsa {
         NodePtr tail_;
 
     public:
-        // constructor
+        // constructors
 
-        template <typename... Args>
+        template <typename... Args,
+                  typename = std::enable_if_t<
+                      std::conjunction_v<std::is_constructible<value_type, Args>...>>>
         LinkedList(Args &&...args) : head_{}, tail_{}
         {
             (insert(std::forward<Args>(args)), ...);
         }
 
-        // iterator
+        LinkedList(const LinkedList &other) : head_{}, tail_{}
+        {
+            for (const auto &el : other) {
+                insert(el);
+            }
+        }
+
+        LinkedList(LinkedList &&other)
+            : head_(std::move(other.head_)), tail_(other.tail_)
+        {
+            other.tail_ = nullptr;
+        }
+
+        // operators
+
+        LinkedList &operator=(const LinkedList &other)
+        {
+            if (this != &other) {
+                clear();
+
+                for (const auto &el : other) {
+                    insert(el);
+                }
+            }
+            return *this;
+        }
+
+        LinkedList &operator=(LinkedList &&other)
+        {
+            if (this != &other) {
+                head_ = std::move(other.head_);
+                tail_ = other.tail_;
+                other.tail_ = nullptr;
+            }
+            return *this;
+        }
+
+        // iterators
 
         const_iterator begin() const { return {head_}; }
         const_iterator end() const { return {tail_ ? tail_->next : head_}; }
@@ -121,16 +161,22 @@ namespace dsa {
 
         // linked list operations
 
-        template <typename K>
-        void insert(K &&key)
+        void clear()
+        {
+            head_.reset();
+            tail_ = nullptr;
+        }
+
+        template <typename Ref>
+        void insert(Ref &&key)
         {
             NodeUniquePtr &next = tail_ ? tail_->next : head_;
 
-            next = std::make_unique<Node>(std::forward<K>(key), nullptr, tail_);
+            next = std::make_unique<Node>(std::forward<Ref>(key), tail_);
             tail_ = next.get();
         }
 
-        bool remove(const T &key)
+        bool remove(const value_type &key)
         {
             for (auto it = begin(), end_ = end(); it != end_; ++it) {
                 if (*it == key) {

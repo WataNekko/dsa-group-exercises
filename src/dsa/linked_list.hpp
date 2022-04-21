@@ -16,9 +16,9 @@ namespace dsa {
         NodeUniquePtr next;
         NodePtr prev;
 
-        template <typename Ref>
-        LinkedListNode(Ref &&key, const NodePtr prev)
-            : key{std::forward<Ref>(key)}, next{}, prev(prev) {}
+        template <typename K>
+        LinkedListNode(K &&key, const NodePtr prev)
+            : key{std::forward<K>(key)}, next{}, prev(prev) {}
 
     }; // struct LinkedListNode
 
@@ -167,31 +167,71 @@ namespace dsa {
             tail_ = nullptr;
         }
 
-        template <typename Ref>
-        void insert(Ref &&key)
+        template <typename K>
+        value_type &insert(K &&key)
         {
             NodeUniquePtr &next = tail_ ? tail_->next : head_;
 
-            next = std::make_unique<Node>(std::forward<Ref>(key), tail_);
+            next = std::make_unique<Node>(std::forward<K>(key), tail_);
             tail_ = next.get();
+
+            return next->key;
         }
 
-        bool remove(const value_type &key)
+    private:
+        void remove(NodeUniquePtr &outPtr)
+        {
+            auto &prevOfNext = outPtr->next
+                                   ? outPtr->next->prev // not tail
+                                   : tail_;             // tail
+            prevOfNext = outPtr->prev;
+
+            outPtr = std::move(outPtr->next);
+        }
+
+    public:
+        template <typename UnaryPredicate>
+        bool removeIf(const UnaryPredicate &predicate)
         {
             for (auto it = begin(), end_ = end(); it != end_; ++it) {
-                if (*it == key) {
-                    auto &curr = *const_cast<NodeUniquePtr *>(it.curr_);
-
-                    (curr->next
-                         ? curr->next->prev // not tail
-                         : tail_            // tail
-                     ) = curr->prev;
-
-                    curr = std::move(curr->next);
+                if (predicate(*it)) {
+                    remove(const_cast<NodeUniquePtr &>(*it.curr_));
                     return true;
                 }
             }
             return false;
+        }
+
+        bool remove(const value_type &key)
+        {
+            return removeIf(
+                [&](const value_type &nodeKey) -> bool { return nodeKey == key; });
+        }
+
+        template <typename UnaryPredicate>
+        size_t removeAllIf(const UnaryPredicate &predicate)
+        {
+            size_t count = 0;
+            for (auto it = begin(), end_ = end(); it != end_;) {
+                if (predicate(*it)) {
+                    remove(const_cast<NodeUniquePtr &>(*it.curr_));
+                    // remove() removes *it.curr_ and advances curr_ to the next node,
+                    // so no need to ++it;
+                    end_ = end(); // update end_ to be valid
+                    // (remove() may invalidate end_ if the last element was removed)
+                    ++count;
+                }
+                else {
+                    ++it;
+                }
+            }
+            return count;
+        }
+
+        size_t removeAll(const value_type &key)
+        {
+            return removeAllIf(
+                [&](const value_type &nodeKey) -> bool { return nodeKey == key; });
         }
 
         // printing

@@ -1,0 +1,12 @@
+[submodule "sorting-algo-benchmark"]
+	path = sorting-algo-benchmark
+	url = https://github.com/WataNekko/dsa-group-exercises.git
+	branch = sorting-algo-benchmark
+[submodule "binary-search-tree"]
+	path = binary-search-tree
+	url = https://github.com/WataNekko/dsa-group-exercises.git
+	branch = binary-search-tree
+[submodule "hash-table"]
+	path = hash-table
+	url = https://github.com/WataNekko/dsa-group-exercises.git
+	branch = hash-table

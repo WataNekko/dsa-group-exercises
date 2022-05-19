@@ -41,7 +41,7 @@ void printMST()
     cout << "Edge   Weight" << endl;
     for(int i=0; i<V; i++)
     {
-        cout << p[i] << " - " << key[i] << endl;
+        cout << p[i] << " - " << i << " " << key[i] << endl;
     }
 }
 void primMST()
@@ -57,7 +57,6 @@ void primMST()
     for(int count = 0; count < V-1; count++)
     {
         int u = minKey();
-        cout << u << endl;
         mstSet[u] = true;//choose the adjacency vertices to work and apply key value
         for(int v = 0; v < V; v++)
         {

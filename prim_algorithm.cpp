@@ -36,7 +36,7 @@ int minKey()
 
 
 
-int printMST()
+void printMST()
 {
     cout << "Edge   Weight" << endl;
     for(int i=0; i<V; i++)

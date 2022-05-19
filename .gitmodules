@@ -10,3 +10,15 @@
 	path = hash-table
 	url = https://github.com/WataNekko/dsa-group-exercises.git
 	branch = hash-table
+[submodule "dijkstra-algo"]
+	path = dijkstra-algo
+	url = https://github.com/WataNekko/dsa-group-exercises.git
+	branch = dijkstra-algo
+[submodule "prim-algo"]
+	path = prim-algo
+	url = https://github.com/WataNekko/dsa-group-exercises.git
+	branch = prim-algo
+[submodule "floyd-algo"]
+	path = floyd-algo
+	url = https://github.com/WataNekko/dsa-group-exercises.git
+	branch = floyd-algo
